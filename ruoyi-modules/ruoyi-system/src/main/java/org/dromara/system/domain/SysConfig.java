@@ -44,6 +44,11 @@ public class SysConfig extends BaseEntity {
     private String configType;
 
     /**
+     * 字段类型（string, int, long, float, double, boolean, decimal, jsonObject, jsonList）
+     */
+    private String configField;
+
+    /**
      * 备注
      */
     private String remark;

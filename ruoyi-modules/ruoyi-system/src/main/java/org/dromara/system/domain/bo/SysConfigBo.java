@@ -4,6 +4,8 @@ import io.github.linpeilie.annotations.AutoMapper;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.Size;
 import lombok.Data;
+import org.dromara.common.core.validate.enums.EnumPattern;
+import org.dromara.system.domain.ConfigFieldType;
 import org.dromara.system.domain.SysConfig;
 
 import java.io.Serializable;
@@ -43,13 +45,20 @@ public class SysConfigBo implements Serializable {
      * 参数键值
      */
     @NotBlank(message = "参数键值不能为空")
-    @Size(min = 0, max = 500, message = "参数键值长度不能超过{max}个字符")
+    @Size(min = 0, max = 65535, message = "参数键值长度不能超过{max}个字符")
     private String configValue;
 
     /**
      * 系统内置（Y是 N否）
      */
     private String configType;
+
+    /**
+     * 字段类型（string, int, long, float, double, boolean, decimal, jsonObject, jsonList）
+     */
+    @NotBlank(message = "字段类型不能为空")
+    @EnumPattern(type = ConfigFieldType.class, fieldName = "value", message = "字段类型不在允许范围内（可选值：string, int, long, float, double, boolean, decimal, jsonObject, jsonList）")
+    private String configField;
 
     /**
      * 备注

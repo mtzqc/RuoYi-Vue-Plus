@@ -553,8 +553,9 @@ CREATE TABLE sys_config
     config_id    bigint                      NOT NULL,
     config_name  nvarchar(100) DEFAULT ''    NULL,
     config_key   nvarchar(100) DEFAULT ''    NULL,
-    config_value nvarchar(500) DEFAULT ''    NULL,
+    config_value nvarchar(max) DEFAULT ''    NULL,
     config_type  nchar(1)      DEFAULT ('N') NULL,
+    config_field nvarchar(32)  DEFAULT ''    NULL,
     create_dept  bigint                      NULL,
     create_by    bigint                      NULL,
     create_time  datetime2(7)                NULL,
@@ -599,6 +600,12 @@ EXEC sys.sp_addextendedproperty
     'COLUMN', N'config_type'
 GO
 EXEC sys.sp_addextendedproperty
+    'MS_Description', N'字段类型（string, int, long, float, double, boolean, decimal, jsonObject, jsonList）' ,
+    'SCHEMA', N'dbo',
+    'TABLE', N'sys_config',
+    'COLUMN', N'config_field'
+GO
+EXEC sys.sp_addextendedproperty
     'MS_Description', N'创建部门' ,
     'SCHEMA', N'dbo',
     'TABLE', N'sys_config',
@@ -640,11 +647,11 @@ EXEC sys.sp_addextendedproperty
     'TABLE', N'sys_config'
 GO
 
-INSERT sys_config VALUES (1761700000000000001, N'用户管理-账号初始密码', N'sys.user.initPassword', N'123456', N'Y', 1761000000000000103, 1761100000000000001, getdate(), NULL, NULL, N'初始化密码 123456')
+INSERT sys_config VALUES (1761700000000000001, N'用户管理-账号初始密码', N'sys.user.initPassword', N'123456', N'Y', N'string', 1761000000000000103, 1761100000000000001, getdate(), NULL, NULL, N'初始化密码 123456')
 GO
-INSERT sys_config VALUES (1761700000000000002, N'账号自助-是否开启用户注册功能', N'sys.account.registerUser', N'false', N'Y', 1761000000000000103, 1761100000000000001, getdate(), NULL, NULL, N'是否开启注册用户功能（true开启，false关闭）')
+INSERT sys_config VALUES (1761700000000000002, N'账号自助-是否开启用户注册功能', N'sys.account.registerUser', N'false', N'Y', N'boolean', 1761000000000000103, 1761100000000000001, getdate(), NULL, NULL, N'是否开启注册用户功能（true开启，false关闭）')
 GO
-INSERT sys_config VALUES (1761700000000000003, N'OSS预览列表资源开关', N'sys.oss.previewListResource', N'true', N'Y', 1761000000000000103, 1761100000000000001, getdate(), NULL, NULL, N'true:开启, false:关闭');
+INSERT sys_config VALUES (1761700000000000003, N'OSS预览列表资源开关', N'sys.oss.previewListResource', N'true', N'Y', N'boolean', 1761000000000000103, 1761100000000000001, getdate(), NULL, NULL, N'true:开启, false:关闭');
 GO
 
 CREATE TABLE sys_dept

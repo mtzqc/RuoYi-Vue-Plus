@@ -19,6 +19,7 @@ import org.dromara.common.mybatis.core.page.PageQuery;
 import org.dromara.common.mybatis.core.query.QueryBuilder;
 import org.dromara.common.redis.utils.CacheUtils;
 import org.dromara.system.api.ConfigService;
+import org.dromara.system.domain.ConfigFieldType;
 import org.dromara.system.domain.SysConfig;
 import org.dromara.system.domain.bo.SysConfigBo;
 import org.dromara.system.domain.vo.SysConfigVo;
@@ -28,6 +29,7 @@ import org.springframework.cache.annotation.CachePut;
 import org.springframework.cache.annotation.Cacheable;
 import org.springframework.stereotype.Service;
 
+import java.math.BigDecimal;
 import java.util.Collection;
 import java.util.List;
 import java.util.Map;
@@ -129,6 +131,7 @@ public class SysConfigServiceImpl implements ISysConfigService, ConfigService {
     @CachePut(cacheNames = CacheNames.SYS_CONFIG, key = "#bo.configKey")
     @Override
     public String insertConfig(SysConfigBo bo) {
+        validateConfigValue(bo);
         SysConfig config = MapstructUtils.convert(bo, SysConfig.class);
         int row = configMapper.insert(config);
         if (row > 0) {
@@ -146,6 +149,7 @@ public class SysConfigServiceImpl implements ISysConfigService, ConfigService {
     @CachePut(cacheNames = CacheNames.SYS_CONFIG, key = "#bo.configKey")
     @Override
     public String updateConfig(SysConfigBo bo) {
+        validateConfigValue(bo);
         int row;
         SysConfig config = MapstructUtils.convert(bo, SysConfig.class);
         if (config.getConfigId() != null) {
@@ -204,6 +208,88 @@ public class SysConfigServiceImpl implements ISysConfigService, ConfigService {
             .neIfPresent(SysConfig::getConfigId, config.getConfigId())
             .exists();
         return !exist;
+    }
+
+    /**
+     * 校验 configValue 是否与 configField 声明的类型匹配
+     *
+     * @param bo 参数配置信息
+     */
+    private void validateConfigValue(SysConfigBo bo) {
+        String configField = bo.getConfigField();
+        String configValue = bo.getConfigValue();
+        // 空值由 @NotBlank 负责校验，此处跳过
+        if (StringUtils.isBlank(configField) || StringUtils.isBlank(configValue)) {
+            return;
+        }
+        ConfigFieldType fieldType = ConfigFieldType.fromValue(configField);
+        // 非法类型由 @EnumPattern 负责校验，此处跳过
+        if (fieldType == null) {
+            return;
+        }
+        switch (fieldType) {
+            case INT -> {
+                try {
+                    Integer.parseInt(configValue);
+                } catch (NumberFormatException e) {
+                    throw new ServiceException("参数键值【{}】不是合法的 int 类型", configValue);
+                }
+            }
+            case LONG -> {
+                try {
+                    Long.parseLong(configValue);
+                } catch (NumberFormatException e) {
+                    throw new ServiceException("参数键值【{}】不是合法的 long 类型", configValue);
+                }
+            }
+            case FLOAT -> {
+                try {
+                    Float.parseFloat(configValue);
+                } catch (NumberFormatException e) {
+                    throw new ServiceException("参数键值【{}】不是合法的 float 类型", configValue);
+                }
+            }
+            case DOUBLE -> {
+                try {
+                    Double.parseDouble(configValue);
+                } catch (NumberFormatException e) {
+                    throw new ServiceException("参数键值【{}】不是合法的 double 类型", configValue);
+                }
+            }
+            case BOOLEAN -> {
+                if (!"true".equalsIgnoreCase(configValue) && !"false".equalsIgnoreCase(configValue)) {
+                    throw new ServiceException("参数键值【{}】不是合法的 boolean 类型（允许值：true/false）", configValue);
+                }
+            }
+            case DECIMAL -> {
+                try {
+                    new BigDecimal(configValue);
+                } catch (NumberFormatException e) {
+                    throw new ServiceException("参数键值【{}】不是合法的 decimal 类型", configValue);
+                }
+            }
+            case JSON_OBJECT -> {
+                try {
+                    Dict result = JsonUtils.parseMap(configValue);
+                    if (result == null) {
+                        throw new ServiceException("参数键值【{}】不是合法的 JSON 对象", configValue);
+                    }
+                } catch (Exception e) {
+                    throw new ServiceException("参数键值【{}】不是合法的 JSON 对象", configValue);
+                }
+            }
+            case JSON_LIST -> {
+                try {
+                    List<Dict> result = JsonUtils.parseArrayMap(configValue);
+                    if (result == null) {
+                        throw new ServiceException("参数键值【{}】不是合法的 JSON 列表", configValue);
+                    }
+                } catch (Exception e) {
+                    throw new ServiceException("参数键值【{}】不是合法的 JSON 列表", configValue);
+                }
+            }
+            // STRING 类型无需校验
+        }
     }
 
     /**

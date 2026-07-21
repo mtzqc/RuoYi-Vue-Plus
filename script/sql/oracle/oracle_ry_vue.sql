@@ -855,8 +855,9 @@ create table sys_config (
   config_id         number(20)     not null,
   config_name       varchar2(100)  default '',
   config_key        varchar2(100)  default '',
-  config_value      varchar2(100)  default '',
+  config_value      clob           default '',
   config_type       char(1)        default 'N',
+  config_field      varchar2(32)   default '',
   create_dept       number(20)     default null,
   create_by         number(20)     default null,
   create_time       date,
@@ -872,6 +873,7 @@ comment on column sys_config.config_name   is '参数名称';
 comment on column sys_config.config_key    is '参数键名';
 comment on column sys_config.config_value  is '参数键值';
 comment on column sys_config.config_type   is '系统内置（Y是 N否）';
+comment on column sys_config.config_field  is '字段类型（string, int, long, float, double, boolean, decimal, jsonObject, jsonList）';
 comment on column sys_config.create_dept   is '创建部门';
 comment on column sys_config.create_by     is '创建者';
 comment on column sys_config.create_time   is '创建时间';
@@ -879,9 +881,9 @@ comment on column sys_config.update_by     is '更新者';
 comment on column sys_config.update_time   is '更新时间';
 comment on column sys_config.remark        is '备注';
 
-insert into sys_config values(1761700000000000001, '用户管理-账号初始密码', 'sys.user.initPassword', '123456', 'Y', 1761000000000000103, 1761100000000000001, sysdate, NULL, null, '初始化密码 123456');
-insert into sys_config values(1761700000000000002, '账号自助-是否开启用户注册功能', 'sys.account.registerUser', 'false', 'Y', 1761000000000000103, 1761100000000000001, sysdate, NULL, null, '是否开启注册用户功能（true开启，false关闭）');
-insert into sys_config values(1761700000000000003, 'OSS预览列表资源开关', 'sys.oss.previewListResource', 'true', 'Y', 1761000000000000103, 1761100000000000001, sysdate, NULL, null, 'true:开启, false:关闭');
+insert into sys_config values(1761700000000000001, '用户管理-账号初始密码', 'sys.user.initPassword', '123456', 'Y', 'string', 1761000000000000103, 1761100000000000001, sysdate, NULL, null, '初始化密码 123456');
+insert into sys_config values(1761700000000000002, '账号自助-是否开启用户注册功能', 'sys.account.registerUser', 'false', 'Y', 'boolean', 1761000000000000103, 1761100000000000001, sysdate, NULL, null, '是否开启注册用户功能（true开启，false关闭）');
+insert into sys_config values(1761700000000000003, 'OSS预览列表资源开关', 'sys.oss.previewListResource', 'true', 'Y', 'boolean', 1761000000000000103, 1761100000000000001, sysdate, NULL, null, 'true:开启, false:关闭');
 
 
 -- ----------------------------

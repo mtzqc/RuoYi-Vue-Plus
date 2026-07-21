@@ -645,8 +645,9 @@ create table sys_config (
     config_id         bigint(20)      not null                   comment '参数主键',
     config_name       varchar(100)    default ''                 comment '参数名称',
     config_key        varchar(100)    default ''                 comment '参数键名',
-    config_value      varchar(500)    default ''                 comment '参数键值',
+    config_value      text            default null               comment '参数键值',
     config_type       char(1)         default 'N'                comment '系统内置（Y是 N否）',
+    config_field      varchar(32)     default ''                 comment '字段类型（string, int, long, float, double, boolean, decimal, jsonObject, jsonList）',
     create_dept       bigint(20)      default null               comment '创建部门',
     create_by         bigint(20)      default null               comment '创建者',
     create_time       datetime                                   comment '创建时间',
@@ -656,9 +657,9 @@ create table sys_config (
     primary key (config_id)
 ) engine=innodb comment = '参数配置表';
 
-insert into sys_config values(1761700000000000001, '用户管理-账号初始密码', 'sys.user.initPassword', '123456', 'Y', 1761000000000000103, 1761100000000000001, sysdate(), null, null, '初始化密码 123456');
-insert into sys_config values(1761700000000000002, '账号自助-是否开启用户注册功能', 'sys.account.registerUser', 'false', 'Y', 1761000000000000103, 1761100000000000001, sysdate(), null, null, '是否开启注册用户功能（true开启，false关闭）');
-insert into sys_config values(1761700000000000003, 'OSS预览列表资源开关', 'sys.oss.previewListResource', 'true', 'Y', 1761000000000000103, 1761100000000000001, sysdate(), null, null, 'true:开启, false:关闭');
+insert into sys_config values(1761700000000000001, '用户管理-账号初始密码', 'sys.user.initPassword', '123456', 'Y', 'string', 1761000000000000103, 1761100000000000001, sysdate(), null, null, '初始化密码 123456');
+insert into sys_config values(1761700000000000002, '账号自助-是否开启用户注册功能', 'sys.account.registerUser', 'false', 'Y', 'boolean', 1761000000000000103, 1761100000000000001, sysdate(), null, null, '是否开启注册用户功能（true开启，false关闭）');
+insert into sys_config values(1761700000000000003, 'OSS预览列表资源开关', 'sys.oss.previewListResource', 'true', 'Y', 'boolean', 1761000000000000103, 1761100000000000001, sysdate(), null, null, 'true:开启, false:关闭');
 
 
 -- ----------------------------

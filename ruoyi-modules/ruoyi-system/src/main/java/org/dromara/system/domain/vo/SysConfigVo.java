@@ -58,6 +58,12 @@ public class SysConfigVo implements Serializable {
     private String configType;
 
     /**
+     * 字段类型
+     */
+    @ExcelProperty(value = "字段类型")
+    private String configField;
+
+    /**
      * 备注
      */
     @ExcelProperty(value = "备注")
